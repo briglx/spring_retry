@@ -7,5 +7,6 @@ The code uses Spring Data with Mongo and the ShedLock library
 
 # References
 
+- Spring Retry https://github.com/spring-projects/spring-retry
 - https://spring.io/guides/gs/accessing-data-jpa/
 - https://github.com/lukas-krecan/ShedLock
