@@ -331,4 +331,12 @@ ASALocalRun/
 
 *.DS_Store
 
+.project
+.classpath
+.settings
 target
+.mvn
+.vscode
+mongosh*
+mvnw*
+application.properties

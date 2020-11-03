@@ -1,0 +1,1 @@
+database.connectionstring=mongodb://<mongo_host>:27017
