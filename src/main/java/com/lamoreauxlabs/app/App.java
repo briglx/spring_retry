@@ -24,10 +24,7 @@ public class App implements CommandLineRunner
 
     public static void main( String[] args )
     {
-        System.out.println( "Hello Remote World!" );
-
-
-
+        System.out.println( "Starting spring retry project!" );
         SpringApplication.run(App.class, args);
     }
 
