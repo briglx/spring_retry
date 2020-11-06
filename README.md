@@ -59,6 +59,24 @@ sudo apt-get update
 sudo apt-get install -y mongodb-org-shell
 ```
 
+Get latest code and run the app
+```bash
+git clone https://github.com/briglx/spring_retry.git
+cd spring_retry
+mvn clean install
+```
+
+Edit the `application.properties` file and replace the value for `database.connectionstring`
+```bash
+cp application.properties.example application.properties
+vi application.properties
+```
+
+Run the applicaton
+```bash
+mvn spring-boot:run
+```
+
 ## Dev Machine Docker setup
 
 Local development uses a docker image to run the code. 
@@ -74,6 +92,10 @@ Check version of JDK and maven with ```mvn -v```
 The goal is to recreate a `Java.net.SocketTimeoutException: connect timed out` exception from the app to mongo in order to test the spring-retry capability.
 
 Several techniques are used to recreate the error.
+
+This is the class diagram of the application
+![Class Diagram](docs/ClassDiagram.png)
+
 
 ## NSG Deny Rule to Mongo
 

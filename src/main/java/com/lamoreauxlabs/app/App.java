@@ -91,6 +91,13 @@ public class App implements CommandLineRunner
             lastName = generator.generate(20);
             repository.save(new Customer(firstName, lastName));
             System.out.println("...[" + batch_limit + "] create record " + firstName + " " + lastName);
+
+            // Add delay to code
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
         }
         
 
