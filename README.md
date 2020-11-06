@@ -52,8 +52,9 @@ Install java jdk, maven, and mongo client
 ```bash
 sudo apt install default-jdk
 sudo apt install maven
-echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org-shell
 ```
@@ -116,4 +117,5 @@ sudo ip route add blackhole 192.168.6.6/32
 - Guide to Spring retry https://www.baeldung.com/spring-retry
 - Configure P2S VPN https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-howto-point-to-site-resource-manager-portal
 - Install jdk on ubuntu https://linoxide.com/ubuntu-how-to/install-java-ubuntu-20-04/
+- Install mongo client https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 - https://github.com/lukas-krecan/ShedLock
