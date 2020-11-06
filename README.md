@@ -7,48 +7,35 @@ The code uses Spring Data with Mongo and the ShedLock library
 
 # Dev Setup
 
-Follow instructions setting up VSCode with docker.
+Overall steps to configure
 
-Debian GNU/Linux 10
+- Create Network Environment
+- Deploy MongoDB Server
+- Deploy App Server
+- Configure Local Development Environment
 
-Check version of JDK and maven with ```mvn -v```
+## Create Network Environment
 
-Create MongoDB on Ubuntu 18.04 VM
+The dev environment has a point to site connection between the local development machine and the remote vms (mongo and app server).
 
-Allow remote connections
+![Network Diagram](docs/SpringRetryDiagram.png)
 
-Connect to remote mongo "mongodb://<replace_with_server_name_or_ip>:27017" 
+- Development vnet: 192.168.0.0/21
+- Default subnet: 192.168.6.0/24
+- App subnet: 192.168.7.0/24
+- Gateway subnet: 192.168.1.0/24
+- Gateway address pool 172.16.0.0/24
 
-Create an `application.properties` file based on `applicaiton.properties.example`.
-Replace the mongo host name.
+## Deploy MongoDB Server
 
-# Time Out Exception
-
-Recreate `Java.net.SocketTimeoutException: connect timed out` by setting vnet rule to deny mongo traffic
-
-This exception is called:  `com.mongodb.MongoSocketOpenException`
-
-# Enable Disable network port on VM
-
-```bash
-
-# lookup process and port
-sudo netstat -lnp
-
-sudo ufw allow 27017
-
-sudo ufw deny 27017
-
-```
-
-# Deploy Mongo on Azure VM
+Create MongoDB on Ubuntu 18.04 VM in Default Subnet
 
 Install mongo
+
 Edit config to allow access from remote systems
 
 ```bash
 sudo vi /etc/mongod.conf
-
 ```
 
 Test you can connect to remote
@@ -56,30 +43,70 @@ Test you can connect to remote
 mongo "mongodb://mongo_server_ip:27017"
 ```
 
+## Deploy App Server
 
-# Trigger Timeout Issue
+Create a new Ubuntu 18.04 vm in a subnet on the vnet. 
 
-- Disconnect from VPN -> Causes `Closed connection` from `com.mongodb.MongoSocketReadException: Prematurely reached end of stream`
-- Send packets to black hole
+Install java jdk, maven, and mongo client
 
-# Point to Site VPN
+```bash
+sudo apt install default-jdk
+sudo apt install maven
+echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+sudo apt-get update
+sudo apt-get install -y mongodb-org-shell
+```
 
-Configure a point to site vpn connection between the local test machine and the remote mongodb server.
+## Dev Machine Docker setup
 
-![Network Diagram](docs/SpringRetryDiagram.png)
+Local development uses a docker image to run the code. 
 
-- Development vnet: 192.168.0.0/21
-- Default subnet: 192.168.6.0/24
-- Gateway subnet: 192.168.1.0/24
-- Gateway address pool 172.16.0.0/24
+Follow instructions setting up VSCode with docker.
+
+Debian GNU/Linux 10
+
+Check version of JDK and maven with ```mvn -v```
+
+# Testing
+
+The goal is to recreate a `Java.net.SocketTimeoutException: connect timed out` exception from the app to mongo in order to test the spring-retry capability.
+
+Several techniques are used to recreate the error.
+
+## NSG Deny Rule to Mongo
+
+Configure an NSG deny rule to mongo.
+
+Outcome: This exception is called:  `com.mongodb.MongoSocketOpenException`
+
+## Disable network port on Mongo Server 
+
+From the Mongo Server, deny traffic to app.
+
+```bash
+sudo netstat -lnp
+sudo ufw allow 27017
+sudo ufw deny 27017
+```
+Outcome: This doesn't affect already established connections.
+
+## Disconnect from VPN
+
+Close the vpn connection.
+
+Outcome: `Closed connection` from `com.mongodb.MongoSocketReadException: Prematurely reached end of stream`
 
 ## Black Hole
 
-Create a blackhole route
+From the App server send traffic intended to mongo to the blackhole.
+
+Create a blackhole route:
 
 ```bash
-sudo ip route add blackhole 10.100.1.10/32
+sudo ip route add blackhole 192.168.6.6/32
 ```
+
 
 # References
 - Developing inside a container https://code.visualstudio.com/docs/remote/containers
@@ -88,4 +115,5 @@ sudo ip route add blackhole 10.100.1.10/32
 - Spring Retry https://github.com/spring-projects/spring-retry
 - Guide to Spring retry https://www.baeldung.com/spring-retry
 - Configure P2S VPN https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-howto-point-to-site-resource-manager-portal
+- Install jdk on ubuntu https://linoxide.com/ubuntu-how-to/install-java-ubuntu-20-04/
 - https://github.com/lukas-krecan/ShedLock
