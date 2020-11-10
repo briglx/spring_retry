@@ -124,10 +124,26 @@ Outcome: `Closed connection` from `com.mongodb.MongoSocketReadException: Prematu
 
 From the App server send traffic intended to mongo to the blackhole.
 
-Create a blackhole route:
+Add and remove a blackhole route:
 
 ```bash
 sudo ip route add blackhole 192.168.6.6/32
+
+sudo ip route del blackhole 192.168.6.6/32
+```
+
+Outcome: 
+- `com.mongodb.MongoSocketOpenException: Exception opening socket Caused by: java.net.ConnectException: Invalid argument (connect failed)`
+- `com.mongodb.MongoSocketReadException: Exception receiving message Caused by: java.net.SocketException: Connection reset`
+
+
+## tc
+
+The baseline network performance latency is about 1.1ms
+
+```bash
+# introduce latency on outbound network interface
+sudo tc qdisc change dev eth0 root netem delay 250ms
 ```
 
 
